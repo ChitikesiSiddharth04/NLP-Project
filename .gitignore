@@ -1,0 +1,18 @@
+# Virtual Environment
+venv/
+/venv/
+.venv/
+.DS_Store
+# Python cache
+__pycache__/
+*.pyc
+
+# Dataset file (large file - not needed for submission)
+IMDB Dataset.csv
+
+# IDE specific
+.idea/
+.vscode/
+
+# Keep confusion_matrix.png - it's part of the project output
+# (PNG files are included by default) 

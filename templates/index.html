@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎬 Movie Review Sentiment Analysis</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+        
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --danger-color: #e74c3c;
+            --bg-color: #ecf0f1;
+            --text-color: #2c3e50;
+            --card-bg-color: #ffffff;
+            --shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        .container {
+            background: var(--card-bg-color);
+            padding: 2rem 2.5rem;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            max-width: 650px;
+            width: 100%;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .language-selector {
+            margin-bottom: 1.5rem;
+        }
+
+        .language-selector button {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 25px;
+            margin: 0 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .language-selector button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .language-selector button:disabled {
+            background: #3498db;
+            cursor: not-allowed;
+            opacity: 0.8;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 2rem;
+            font-weight: 700;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 2px solid #bdc3c7;
+            font-size: 1rem;
+            font-family: 'Poppins', sans-serif;
+            margin-bottom: 1.5rem;
+            resize: vertical;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease;
+        }
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        button {
+            background: linear-gradient(45deg, var(--primary-color), #2980b9);
+            color: white;
+            padding: 0.8rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.5);
+        }
+        button:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        #result-container {
+            margin-top: 2rem;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        
+        .result {
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: left;
+            border-left: 7px solid;
+            background-color: #f8f9fa;
+        }
+        .result.positive {
+            border-left-color: var(--secondary-color);
+        }
+        .result.negative {
+            border-left-color: var(--danger-color);
+        }
+
+        .result h2 {
+            margin-top: 0;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+        .result h3 {
+            font-weight: 600;
+        }
+        .result p {
+            font-style: italic;
+            color: #7f8c8d;
+            margin-bottom: 1rem;
+            word-wrap: break-word;
+        }
+        
+        .result-sentiment.positive { color: var(--secondary-color); }
+        .result-sentiment.negative { color: var(--danger-color); }
+
+        .loader {
+            display: none;
+            width: 30px;
+            height: 30px;
+            border: 4px solid var(--primary-color);
+            border-top: 4px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 1rem auto 0;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎬 Movie Review Sentiment Analysis</h1>
+        
+        <div class="language-selector">
+            <button onclick="window.location.href='/english'" {% if lang == 'english' %}disabled{% endif %}>English</button>
+            <button onclick="window.location.href='/telugu'" {% if lang == 'telugu' %}disabled{% endif %}>తెలుగు</button>
+        </div>
+        <form id="review-form">
+            <textarea name="review" id="review-text" rows="8" placeholder="{% if lang == 'telugu' %}ఒక సినిమా సమీక్షను నమోదు చేయండి... ఉదా., 'ఈ సినిమా చాలా బాగుంది!'{% else %}Enter a movie review... e.g., 'This movie was absolutely fantastic!'{% endif %}"></textarea>
+            <button type="submit" id="submit-btn">{% if lang == 'telugu' %}విశ్లేషించండి{% else %}Analyze{% endif %}</button>
+        </form>
+
+        <div class="loader" id="loader"></div>
+        
+        <div id="result-container"></div>
+    </div>
+
+    <script>
+        const form = document.getElementById('review-form');
+        const reviewText = document.getElementById('review-text');
+        const submitBtn = document.getElementById('submit-btn');
+        const resultContainer = document.getElementById('result-container');
+        const loader = document.getElementById('loader');
+        const lang = '{{ lang }}';
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const review = reviewText.value;
+            if (review.trim() === '') {
+                alert(lang === 'telugu' ? 'దయచేసి సమీక్షను నమోదు చేయండి.' : 'Please enter a review.');
+                return;
+            }
+
+            // Show loader and disable button
+            loader.style.display = 'block';
+            submitBtn.disabled = true;
+            submitBtn.innerText = lang === 'telugu' ? 'విశ్లేషిస్తోంది...' : 'Analyzing...';
+            resultContainer.style.opacity = 0;
+
+            try {
+                const endpoint = lang === 'telugu' ? '/predict_telugu' : '/predict';
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({ review })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Server error. Please try again later.');
+                }
+                
+                const data = await response.json();
+                displayResult(data);
+
+            } catch (error) {
+                resultContainer.innerHTML = `<div class="result negative"><p><strong>Error:</strong> ${error.message}</p></div>`;
+                resultContainer.style.opacity = 1;
+            } finally {
+                // Hide loader and re-enable button
+                loader.style.display = 'none';
+                submitBtn.disabled = false;
+                submitBtn.innerText = lang === 'telugu' ? 'విశ్లేషించండి' : 'Analyze';
+            }
+        });
+
+        function displayResult(data) {
+            const sentimentClass = data.sentiment.toLowerCase();
+            let sentimentDisplay = data.sentiment;
+            if (lang === 'telugu' && data.sentiment_telugu) {
+                sentimentDisplay = `${data.sentiment_telugu} (${data.sentiment})`;
+            }
+
+            const resultHTML = `
+                <div class="result ${sentimentClass}">
+                    <h2>${lang === 'telugu' ? 'విశ్లేషణ పూర్తయింది' : 'Analysis Complete'}</h2>
+                    <p>"${escapeHTML(data.review)}"</p>
+                    <h3>Sentiment: <strong class="result-sentiment ${sentimentClass}">${sentimentDisplay}</strong></h3>
+                </div>
+            `;
+            resultContainer.innerHTML = resultHTML;
+            resultContainer.style.opacity = 1;
+            resultContainer.style.transform = 'translateY(0)';
+        }
+
+        function escapeHTML(str) {
+            return str.replace(/[&<>"']/g, function(match) {
+                return {
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#39;'
+                }[match];
+            });
+        }
+    </script>
+</body>
+</html>
