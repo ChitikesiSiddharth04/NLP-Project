@@ -185,9 +185,3 @@ Render will automatically build and deploy your application. Once it's live, you
 **Telugu Positive:** "ఈ సినిమా చాలా బాగుంది. నటీనటుల అభినయం అద్భుతంగా ఉంది."
 
 **Telugu Negative:** "ఈ సినిమా చాలా చెడ్డగా ఉంది. కథ లేకుండా నడిపించారు."
-
-### Tricky Reviews to Test
-- Mixed sentiment reviews
-- Sarcastic reviews
-- Reviews with complex emotions
-- Short vs. long reviews
