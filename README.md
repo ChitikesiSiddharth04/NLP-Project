@@ -149,10 +149,6 @@ Open your browser and navigate to `http://127.0.0.1:5001` to use the bilingual a
 - **Dataset**: Custom Telugu movie reviews
 - **Best Algorithm**: Bernoulli Naive Bayes
 
-## ☁️ Deployment to Render
-
-This bilingual application is ready to be deployed for free on [Render](https://render.com/).
-
 ### 1. Create a GitHub Repository
 
 Push your project code to a new repository on GitHub.
